@@ -1,3 +1,5 @@
+# RUN THESE COMMANDS FROM THE LOCATION OF THE DOCKERFILE
+
 # Build the Docker image
 docker build -t java-hello-world-custom-tag .
 
