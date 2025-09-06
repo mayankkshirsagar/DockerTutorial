@@ -19,3 +19,9 @@ Even if every stage uses a full base OS image like ubuntu, the final image only 
     2. Any files copied into it
     3. No leftover build tools, compilers, source code, or previous image layers unless explicitly copied
 Each stage is a separate image, and Docker only uses the final one to produce the final result.
+
+# Why RUN echo ... output might be hidden during build?
+BuildKit (modern default builder) buffers and hides the output of RUN commands that complete successfully.
+It only shows output if the command fails or if you disable BuildKit.
+So even though echo "date is : $DATE" runs and prints text, you might not see it in the build logs.
+DOCKER_BUILDKIT=0 docker build --build-arg DATE="5-10-15" -t java-hello-world-custom-tag .

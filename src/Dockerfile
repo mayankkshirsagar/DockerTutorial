@@ -2,6 +2,9 @@
 # stage 1
 FROM eclipse-temurin:17-jdk AS builder
 
+# if we need to pass arguments in the build command : docker build --build-arg DATE="5-10-15"  -t java-hello-world-custom-tag .
+ARG DATE
+
 # create workdir in docker, this will be working directory in our docker space
 WORKDIR /app
 # CMD ["pwd"] -> /app
@@ -10,6 +13,10 @@ WORKDIR /app
 COPY Main.java .
 # COPY . .   -> this copies everything in the dockerfile directory, we can use dockerignore file to ignore similar to git ignore
 # COPY instruction.txt . -> copy instruction.txt to docker
+
+# ADD DOCKER_BUILDKIT=0  in build command to see the echo output during build
+# DOCKER_BUILDKIT=0 docker build --build-arg DATE="5-10-15" -t java-hello-world-custom-tag .
+RUN echo "DATE IS ${DATE}"
 
 RUN javac Main.java
 
