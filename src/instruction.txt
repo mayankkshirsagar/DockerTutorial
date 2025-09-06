@@ -25,3 +25,6 @@ BuildKit (modern default builder) buffers and hides the output of RUN commands t
 It only shows output if the command fails or if you disable BuildKit.
 So even though echo "date is : $DATE" runs and prints text, you might not see it in the build logs.
 DOCKER_BUILDKIT=0 docker build --build-arg DATE="5-10-15" -t java-hello-world-custom-tag .
+
+# docker Registry
+
