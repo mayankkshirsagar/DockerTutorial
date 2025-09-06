@@ -11,3 +11,10 @@ docker save -o java-hello-world-custom-tag.tar java-hello-world-custom-tag
 
 # load from the tar
 docker load -i java-hello-world-custom-tag.tar
+
+# why multi stage image reduces size ?
+Even if every stage uses a full base OS image like ubuntu, the final image only includes:
+    1. The final stage’s base image (e.g., alpine, ubuntu, etc.)
+    2. Any files copied into it
+    3. No leftover build tools, compilers, source code, or previous image layers unless explicitly copied
+Each stage is a separate image, and Docker only uses the final one to produce the final result.
