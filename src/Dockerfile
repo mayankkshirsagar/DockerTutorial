@@ -16,12 +16,12 @@ RUN javac Main.java
 # multi stage docker file used to get smaller images with only minimal requirements, which helps reducing size
 # in this example we are using entire jdk image to run the java program vs in the multistage we first create class using JDK but only run using JRE which is much smaller in size
 # each stage is a separate image, and Docker only uses the final one to produce the final result.
-# first build this image and see the size of the image
-# next uncomment the below 2 lines and build and see the size of the image
+# first build this image and see the size of the image (image size = 600 mb due to jdk)
+# next uncomment the below 2 lines and build and see the size of the image (image size = 300 mb due to jre)
 
 # stage 2
-# FROM eclipse-temurin:17-jre-focal AS server
-# COPY --from=builder /app/Main.class .
+FROM eclipse-temurin:17-jre-focal AS server
+COPY --from=builder /app/Main.class .
 
 # only one CMD command can run in a stage, if multiple are added only last one will run
 # CMD ["pwd"]

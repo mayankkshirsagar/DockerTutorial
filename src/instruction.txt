@@ -1,18 +1,19 @@
 # RUN THESE COMMANDS FROM THE LOCATION OF THE DOCKERFILE
 
-# Build the Docker image
+# Build the Docker image , -t java-hello-world-custom-tag = custom name for the image ,
+# [.] indicates search for docker file in pwd directory
 docker build -t java-hello-world-custom-tag .
 
-# Run the container
+# Run the container , --rm means remove container once done running
 docker run --rm java-hello-world-custom-tag
 
 # create a tar of the docker image
 docker save -o java-hello-world-custom-tag.tar java-hello-world-custom-tag
 
-# load from the tar
+# load image from the tar
 docker load -i java-hello-world-custom-tag.tar
 
-# why multi stage image reduces size ?
+# why multistage image reduces size ?
 Even if every stage uses a full base OS image like ubuntu, the final image only includes:
     1. The final stage’s base image (e.g., alpine, ubuntu, etc.)
     2. Any files copied into it
