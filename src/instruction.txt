@@ -27,4 +27,29 @@ So even though echo "date is : $DATE" runs and prints text, you might not see it
 DOCKER_BUILDKIT=0 docker build --build-arg DATE="5-10-15" -t java-hello-world-custom-tag .
 
 # docker Registry
+Pulling from docker registry and existing image
+docker pull /server/username/repository:tag for example we can run
+docker pull alpine , this maps to docker pull docker.io/library/alpine:latest
+output :
+Status: Downloaded newer image for alpine:latest
+docker.io/library/alpine:latest
+if specific tag is not provided , it will assume its latest
+if server and username is not specified it will assume its docker.io and library
+
+Pushing our image to docker hub
+First create our image : docker build -t docker-basic-test .
+Now we need to assign a tag to this image
+docker tag docker-basic-test docker.io/mayankkshirsagar/docker-basic-test:latest
+Now if we check images we see
+REPOSITORY                           TAG       IMAGE ID       CREATED      SIZE
+docker-basic-test                    latest    a7d18d685ade   3 days ago   369MB
+mayankkshirsagar/docker-basic-test   latest    a7d18d685ade   3 days ago   369MB
+Now push
+docker push mayankkshirsagar/docker-basic-test
+For authentication which is needed when pulling private repo we need to set docker user
+docker login -u username server , so we can use
+docker login -u mayankkshirsagar docker.io
+to remove credentials , docker logout server
+docker logout docker.io
+
 
