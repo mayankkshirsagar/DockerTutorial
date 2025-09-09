@@ -53,3 +53,42 @@ to remove credentials , docker logout server
 docker logout docker.io
 
 # running docker images interactively and in background
+docker run -d imagename , this frees the terminal and docker image runs in the background
+
+docker build -t docker-basic-test .
+docker run -d docker-basic-test
+this starts the docker container, run docker ps to see the container info
+ docker ps
+CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS     NAMES
+9f653e069e0e   docker-basic-test   "/__cacert_entrypoin…"   3 seconds ago   Up 2 seconds             vigorous_keller
+once the image finishes running , docker ps will be empty
+ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+to get list of all processes, docker ps -a
+ docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED              STATUS                      PORTS     NAMES
+9f653e069e0e   docker-basic-test   "/__cacert_entrypoin…"   17 seconds ago       Exited (0) 12 seconds ago             vigorous_keller
+to remove and old container from docker ps -a
+docker rm 9f653e069e0e
+docker ps -a , results in empty
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+docker container have a random name, to have a specific name we can use while the container is running
+docker name vigorous_keller custom_name
+but to start image container with a custom name
+docker run -d --name container_named docker-basic-test
+docker ps
+CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS     NAMES
+343017245f38   docker-basic-test   "/__cacert_entrypoin…"   4 seconds ago   Up 4 seconds             container_named
+
+to check logs in container
+docker logs containerid
+ docker logs 343017245f38
+Hello and welcome!
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+
+
