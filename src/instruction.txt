@@ -52,4 +52,4 @@ docker login -u mayankkshirsagar docker.io
 to remove credentials , docker logout server
 docker logout docker.io
 
-
+# running docker images interactively and in background
