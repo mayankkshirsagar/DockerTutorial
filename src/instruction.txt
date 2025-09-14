@@ -182,4 +182,383 @@ this is because all the containers are using the same volume
 what it is doing here is /data is created in container which is mapping to the volume itself and
 hence we can share data between diff containers who are using this mounting path for volume
 
+# docker networks
+dcker network is used to communicate between diff containers on same and diff networks
+
+docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+2a6dd623e77f   bridge    bridge    local
+d3ba637177c5   host      host      local
+55563fdde4c7   none      null      local
+
+bridge is default network for a container when we dont specify a specific network
+host is the same network as the local machine which is running so if we specify container to host,
+we can access it using same way as any other device on the local network
+null is used when we dont want to communicate to any other network or container at all, this is for complete isolation
+
+to inspect a network
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "2a6dd623e77f6ee007afaeedff649d875881291b631d57a10cd0a8cee033184d",
+        "Created": "2025-09-14T03:30:45.520244833Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+notice that containers is empty
+now if we run a container and dont provide any network
+docker run -d docker-basic-test
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "b6a1c7277429da8a972bfacf88d596d48e5e8ed4cd60d8ac98c4303916743491",
+        "Created": "2025-09-14T04:15:27.005318166Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "b1ee5220ac0d32a27647b04926df3c4eebc351642d2530ecb72fb65994b7f828": {
+                "Name": "blissful_burnell",
+                "EndpointID": "f73df86ee1a2ac6cea378613784e91b407a486f2e175f3039db26ad4a93f7f1c",
+                "MacAddress": "1e:fc:8c:85:01:57",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+we will see that we have a container entry in bridge, since we did not provide any network, its using bridge by default
+
+to create a new network
+docker network create test-network
+docker network inspect test-network
+[
+    {
+        "Name": "test-network",
+        "Id": "43e947ced65ef24d32f231c45920782fbb45452eb5ecebf222bcd29d026d5c86",
+        "Created": "2025-09-14T04:20:51.85572472Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {}
+    }
+]
+test network is empty and does not have any container
+
+docker networks ls
+NETWORK ID     NAME           DRIVER    SCOPE
+b6a1c7277429   bridge         bridge    local
+d3ba637177c5   host           host      local
+55563fdde4c7   none           null      local
+43e947ced65e   test-network   bridge    local
+
+lets create 2 new container
+docker build -t docker-test .
+docker run -d --name c1 docker-test
+docker run -d --name c2 docker-test
+
+now inspect bridge, we see both containers in bridge
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "b6a1c7277429da8a972bfacf88d596d48e5e8ed4cd60d8ac98c4303916743491",
+        "Created": "2025-09-14T04:15:27.005318166Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "2fc04cca5609c195cb8bb6425251a86eb8596cca76a9a1828741b8b0ae74f360": {
+                "Name": "c2",
+                "EndpointID": "bb8bdde717cb7e6550eeeb543056309d06784dc6edac4489195fe2b3359d36d0",
+                "MacAddress": "9a:cb:d9:48:8f:07",
+                "IPv4Address": "172.17.0.3/16",
+                "IPv6Address": ""
+            },
+            "8bdb84ecd6a35499aca711ce470c5f633fe975614161f406cd4d41d813627212": {
+                "Name": "c1",
+                "EndpointID": "387209d516bf85904b06b28c03d1ea47b049f2681fc0551bd390efdcc8f411d2",
+                "MacAddress": "06:31:93:88:0d:67",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+
+now lets assign test network to our new containers
+docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED         STATUS         PORTS     NAMES
+2fc04cca5609   docker-test   "/__cacert_entrypoin…"   2 minutes ago   Up 2 minutes             c2
+8bdb84ecd6a3   docker-test   "/__cacert_entrypoin…"   2 minutes ago   Up 2 minutes             c1
+docker network connect test-network c1
+docker network connect test-network c2
+now if we inspect test-network we should see both containers, also both of them are still in bridge as well
+docker network inspect test-network
+[
+    {
+        "Name": "test-network",
+        "Id": "43e947ced65ef24d32f231c45920782fbb45452eb5ecebf222bcd29d026d5c86",
+        "Created": "2025-09-14T04:20:51.85572472Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "2fc04cca5609c195cb8bb6425251a86eb8596cca76a9a1828741b8b0ae74f360": {
+                "Name": "c2",
+                "EndpointID": "fb9f250c8e15c8fee93034abd82c1f1f2c0b9a43e5770b5cd6af3927210376bd",
+                "MacAddress": "8a:ca:05:5c:21:35",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "8bdb84ecd6a35499aca711ce470c5f633fe975614161f406cd4d41d813627212": {
+                "Name": "c1",
+                "EndpointID": "353f30c1441771953fe9a4eff74e2109e22805f7338e8ea707a77c7a0a178475",
+                "MacAddress": "5e:5a:7a:a7:b2:d9",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.enable_ipv4": "true",
+            "com.docker.network.enable_ipv6": "false"
+        },
+        "Labels": {}
+    }
+]
+
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "b6a1c7277429da8a972bfacf88d596d48e5e8ed4cd60d8ac98c4303916743491",
+        "Created": "2025-09-14T04:15:27.005318166Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "2fc04cca5609c195cb8bb6425251a86eb8596cca76a9a1828741b8b0ae74f360": {
+                "Name": "c2",
+                "EndpointID": "bb8bdde717cb7e6550eeeb543056309d06784dc6edac4489195fe2b3359d36d0",
+                "MacAddress": "9a:cb:d9:48:8f:07",
+                "IPv4Address": "172.17.0.3/16",
+                "IPv6Address": ""
+            },
+            "8bdb84ecd6a35499aca711ce470c5f633fe975614161f406cd4d41d813627212": {
+                "Name": "c1",
+                "EndpointID": "387209d516bf85904b06b28c03d1ea47b049f2681fc0551bd390efdcc8f411d2",
+                "MacAddress": "06:31:93:88:0d:67",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+
+default bridge network does not support dns resolution while the test-network we created supports dns resolution
+
+to disconnect a container from a particular network
+docker network disconnect bridge c1
+docker network disconnect bridge c2
+now if we inspect bridge we wont find c1 and c2
+docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "b6a1c7277429da8a972bfacf88d596d48e5e8ed4cd60d8ac98c4303916743491",
+        "Created": "2025-09-14T04:15:27.005318166Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+we still have our both containers in our test-network
+if we have 2 containers running in same test-network and we sh in one terminal and call other container using curl,
+we will get resposne from other container, this is because of the DNS resolution in our test-network
+
+docker dns port is 127.0.0.11
+example using alpine can be found here https://docs.docker.com/engine/network/ and https://docs.docker.com/engine/network/tutorials/standalone/
+and here https://www.udemy.com/course/docker-crash-course-for-beginners/learn/lecture/51069563#overview
 
