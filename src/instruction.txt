@@ -562,3 +562,14 @@ docker dns port is 127.0.0.11
 example using alpine can be found here https://docs.docker.com/engine/network/ and https://docs.docker.com/engine/network/tutorials/standalone/
 and here https://www.udemy.com/course/docker-crash-course-for-beginners/learn/lecture/51069563#overview
 
+
+# DOCKER Compose
+docker allows us to run multiple docker container/images using a single yaml file
+as in large systems we can not run each container one by one
+
+we create a docker-compose.yaml file and put all the requirements like, images, volumes, dependencies etc in it
+and to read the file
+    docker compose up
+this reads the compose yaml file in that directory and starts executing
+to stop
+    docker compose down
